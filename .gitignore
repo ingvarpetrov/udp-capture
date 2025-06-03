@@ -1,5 +1,5 @@
 # Ignore output directory
-/output/
+
 
 # Ignore Docker build artifacts
 *.tar
@@ -21,4 +21,4 @@ test_capture_*.ts
 __pycache__/
 
 # Ignore Cursor IDE/project files
-.cursor 
+.cursor/ 
