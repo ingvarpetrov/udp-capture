@@ -18,13 +18,26 @@ while IFS= read -r line; do
 done < "$CONFIG_FILE"
 
 TMPFILE="test_capture_$$.ts"
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
+PROJECT_DIR=$(pwd)
 
-echo "Testing capture from $UDP_ADDR..."
+# Build the docker run command
+DOCKER_CMD=(docker run --rm \
+  -u $USER_ID:$GROUP_ID \
+  -v "$PROJECT_DIR":/data \
+  --network host \
+  tsduck-capture)
+
+TSP_CMD=(tsp)
 if [ -n "$INTERFACE_IP" ]; then
-  tsp -I ip $UDP_ADDR --local-address "$INTERFACE_IP" -O file "$TMPFILE" --max-duration 5
+  TSP_CMD+=( -I ip "$UDP_ADDR" --local-address "$INTERFACE_IP" -O file "/data/$TMPFILE" --max-duration 5 )
 else
-  tsp -I ip $UDP_ADDR -O file "$TMPFILE" --max-duration 5
+  TSP_CMD+=( -I ip "$UDP_ADDR" -O file "/data/$TMPFILE" --max-duration 5 )
 fi
+
+echo "Testing capture from $UDP_ADDR using Docker..."
+"${DOCKER_CMD[@]}" "${TSP_CMD[@]}"
 
 if [ -s "$TMPFILE" ]; then
   echo "SUCCESS: Data captured from $UDP_ADDR ($TMPFILE, $(du -h "$TMPFILE" | cut -f1))"
