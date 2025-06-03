@@ -19,24 +19,25 @@ echo
 cat <<'EOF'
 
 ============================================================
-             [1;36mUDP Mass Capture System - Installation Complete[0m
+ UDP Mass Capture System - Installation Complete
 ============================================================
 
-[1mNext steps:[0m
 
-  1. [32mTest a stream[0m:
+echo -e "\033[1mNext steps:\033[0m"
+
+  1. \033[32mTest a stream\033[0m:
      ./test.sh <your-udp-address>   # e.g. ./test.sh 239.0.0.1:1234
      (Use your own UDP address to verify you can receive data before editing the config)
 
-  2. [32mEdit the configuration file[0m:
+  2. \033[32mEdit the configuration file\033[0m:
      capture.cfg
 
-  3. [32mStart the capture process[0m:
+  3. \033[32mStart the capture process\033[0m:
      ./run.sh
 
-  4. [32mMonitor the session[0m:
+  4. \033[32mMonitor the session\033[0m:
      ./monitor.sh
 
-[36mYou are now in the udp-capture-main directory.[0m
+\033[36mYou are now in the udp-capture-main directory.\033[0m
 ============================================================
 EOF 
