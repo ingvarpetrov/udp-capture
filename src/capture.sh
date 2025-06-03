@@ -50,14 +50,16 @@ parse_config() {
 }
 
 show_instructions() {
-    echo -e "${BLUE}${BOX_TOP}${RESET}"
-    echo -e "${BOLD}${CYAN}|                Mass Capture Session                  |${RESET}"
-    echo -e "${BLUE}${BOX_BOTTOM}${RESET}"
-    echo -e "${YELLOW}[Instructions]${RESET}"
-    echo -e "  • ${BOLD}Stop:${RESET}      Ctrl-b x"
-    echo -e "  • ${BOLD}Detach:${RESET}    Ctrl-b d"
-    echo -e "  • ${BOLD}Restart:${RESET}   exit and run ./run.sh"
-    echo -e "${BLUE}${BOX_SEP}${RESET}"
+    echo   "$BOX_TOP"
+    echo   "|                Mass Capture Session                  |"
+    echo   "$BOX_BOTTOM"
+    echo   "| [Instructions]                                      |"
+    echo   "|  • Stop:      Ctrl-b x (kills capture, all files     |"
+    echo   "|                will be finalized)                   |"
+    echo   "|  • Detach:    Ctrl-b d (capture continues running    |"
+    echo   "|                in the background)                   |"
+    echo   "|  • Restart:   exit and run ./run.sh                 |"
+    echo   "$BOX_SEP"
 }
 
 # Track per-stream segment completion

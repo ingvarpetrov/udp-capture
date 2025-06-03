@@ -19,6 +19,7 @@ if ! docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
     --name $CONTAINER_NAME \
     --network host \
     --privileged \
+    -u $USER_ID:$GROUP_ID \
     -e USER_ID=$USER_ID \
     -e GROUP_ID=$GROUP_ID \
     -v "$PROJECT_DIR/src":/src \
