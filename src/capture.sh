@@ -1,0 +1,158 @@
+#!/bin/bash
+set -e
+
+# Color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+BOX_TOP="+------------------------------------------------------+"
+BOX_BOTTOM="+------------------------------------------------------+"
+BOX_SEP="|------------------------------------------------------|"
+
+
+echo -e "${CYAN}[DEBUG] capture.sh started at $(date)${RESET}" >&2
+CONFIG_FILE="/app/capture.cfg"
+
+# Parse config
+output_folder="./output"
+parallel_streams=4
+segment_length_hours=1
+total_segments=24
+udp_streams=()
+interface_ip=""
+
+parse_config() {
+    local in_streams=0
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$line" =~ ^output_folder= ]]; then
+            output_folder="${line#output_folder=}"
+        elif [[ "$line" =~ ^parallel_streams= ]]; then
+            parallel_streams="${line#parallel_streams=}"
+        elif [[ "$line" =~ ^segment_length_hours= ]]; then
+            segment_length_hours="${line#segment_length_hours=}"
+        elif [[ "$line" =~ ^total_segments= ]]; then
+            total_segments="${line#total_segments=}"
+        elif [[ "$line" =~ ^interface_ip= ]]; then
+            interface_ip="${line#interface_ip=}"
+        elif [[ "$line" == "udp_streams:" ]]; then
+            in_streams=1
+        elif [[ $in_streams -eq 1 && -n "$line" ]]; then
+            udp_streams+=("$line")
+        fi
+    done < "$CONFIG_FILE"
+    echo -e "${CYAN}[DEBUG] Parsed config: output_folder=$output_folder, parallel_streams=$parallel_streams, segment_length_hours=$segment_length_hours, total_segments=$total_segments, interface_ip=$interface_ip, udp_streams=(${udp_streams[*]})${RESET}" >&2
+}
+
+show_instructions() {
+    echo -e "${BLUE}${BOX_TOP}${RESET}"
+    echo -e "${BOLD}${CYAN}|                Mass Capture Session                  |${RESET}"
+    echo -e "${BLUE}${BOX_BOTTOM}${RESET}"
+    echo -e "${YELLOW}[Instructions]${RESET}"
+    echo -e "  • ${BOLD}Stop:${RESET}      Ctrl-b x"
+    echo -e "  • ${BOLD}Detach:${RESET}    Ctrl-b d"
+    echo -e "  • ${BOLD}Restart:${RESET}   exit and run ./run.sh"
+    echo -e "${BLUE}${BOX_SEP}${RESET}"
+}
+
+# Track per-stream segment completion
+stream_segments=()
+
+show_progress() {
+    echo -e "${CYAN}[Current Streams Capturing]${RESET}"
+    for idx in "${!active_streams[@]}"; do
+        printf "  %2d. %-20s  [Segments: %d/%d]\n" $((idx+1)) "${active_streams[$idx]}" "${stream_segments[$idx]}" "$total_segments"
+    done
+    echo -e "\n${MAGENTA}[Progress]${RESET}"
+    printf "  Segment:        %s / %s\n" "$current_segment" "$total_segments"
+    # Progress bar for current segment
+    local percent=$(( 100 * elapsed / segment_seconds ))
+    local bar_length=20
+    local filled=$(( bar_length * percent / 100 ))
+    local empty=$(( bar_length - filled ))
+    local bar=""
+    for ((i=0; i<filled; i++)); do bar+="#"; done
+    for ((i=0; i<empty; i++)); do bar+="-"; done
+    local mins=$(( (segment_seconds - elapsed) / 60 ))
+    local secs=$(( (segment_seconds - elapsed) % 60 ))
+    printf "  Time left:      %2dm %02ds [${GREEN}%s${RESET}] %d%%\n" "$mins" "$secs" "$bar" "$percent"
+    # Overall progress
+    local total_segments_all=$((total_streams * total_segments))
+    local completed=0
+    for seg in "${stream_segments[@]}"; do
+        completed=$((completed + seg))
+    done
+    local overall_percent=$(( 100 * completed / total_segments_all ))
+    local overall_filled=$(( bar_length * overall_percent / 100 ))
+    local overall_empty=$(( bar_length - overall_filled ))
+    local overall_bar=""
+    for ((i=0; i<overall_filled; i++)); do overall_bar+="#"; done
+    for ((i=0; i<overall_empty; i++)); do overall_bar+="-"; done
+    printf "  Overall:        [%s] %d%% (%d/%d segments complete)\n" "$overall_bar" "$overall_percent" "$completed" "$total_segments_all"
+    # Disk space
+    local diskline=$(df -h "$output_folder" | tail -1)
+    local avail=$(echo "$diskline" | awk '{print $4}')
+    local mount=$(echo "$diskline" | awk '{print $6}')
+    printf "  Disk space:     %s free (mounted on %s)\n" "$avail" "$mount"
+    echo -e "${BLUE}${BOX_SEP}${RESET}"
+}
+
+main() {
+    parse_config
+    mkdir -p "$output_folder"
+    segment_seconds=$((segment_length_hours * 3600))
+    total_streams=${#udp_streams[@]}
+    current_segment=1
+    # Initialize per-stream segment counters
+    for ((i=0; i<$total_streams; i++)); do
+        stream_segments[$i]=0
+    done
+
+    while [[ $current_segment -le $total_segments ]]; do
+        echo "Starting segment $current_segment/$total_segments..."
+        active_streams=()
+        pids=()
+        idxs=()
+        for ((i=0; i<$total_streams && i<$parallel_streams; i++)); do
+            stream="${udp_streams[$i]}"
+            out_file="$output_folder/stream$(printf '%02d' $((i+1)))_seg$(printf '%02d' $current_segment).ts"
+            echo -e "${YELLOW}[DEBUG] Launching: tsp -I ip $stream -O file $out_file${RESET}" >&2
+            if [[ -n "$interface_ip" ]]; then
+                tsp -I ip $stream --local-address "$interface_ip" -O file "$out_file" &
+            else
+                tsp -I ip $stream -O file "$out_file" &
+            fi
+            pids+=("$!")
+            active_streams+=("$stream")
+            idxs+=("$i")
+        done
+        start_time=$(date +%s)
+        while :; do
+            elapsed=$(( $(date +%s) - start_time ))
+            clear
+            show_instructions
+            show_progress
+            if [[ $elapsed -ge $segment_seconds ]]; then
+                break
+            fi
+            sleep 10
+        done
+        # Kill all tsp processes for this segment
+        for pid in "${pids[@]}"; do
+            kill $pid 2>/dev/null || true
+        done
+        # Update per-stream segment counters
+        for idx in "${idxs[@]}"; do
+            stream_segments[$idx]=$(( ${stream_segments[$idx]} + 1 ))
+        done
+        current_segment=$((current_segment+1))
+    done
+    echo -e "${GREEN}Capture complete.${RESET}"
+}
+
+main 

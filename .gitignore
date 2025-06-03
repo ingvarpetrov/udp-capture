@@ -1,0 +1,21 @@
+# Ignore output directory
+/output/
+
+# Ignore Docker build artifacts
+*.tar
+*.img
+
+# Ignore temporary files
+*~
+*.swp
+*.tmp
+.DS_Store
+
+# Ignore test capture files
+test_capture_*.ts
+
+# Ignore log files
+*.log
+
+# Ignore Python cache (if any)
+__pycache__/ 
