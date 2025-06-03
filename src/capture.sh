@@ -53,12 +53,12 @@ show_instructions() {
     echo   "$BOX_TOP"
     echo   "|                Mass Capture Session                  |"
     echo   "$BOX_BOTTOM"
-    echo   "| [Instructions]                                      |"
+    echo   "| [Instructions]                                       |"
     echo   "|  • Stop:      Ctrl-b x (kills capture, all files     |"
-    echo   "|                will be finalized)                   |"
+    echo   "|                will be finalized)                    |"
     echo   "|  • Detach:    Ctrl-b d (capture continues running    |"
-    echo   "|                in the background)                   |"
-    echo   "|  • Restart:   exit and run ./run.sh                 |"
+    echo   "|                in the background)                    |"
+    echo   "|  • Restart:   exit and run ./run.sh                  |"
     echo   "$BOX_SEP"
 }
 
