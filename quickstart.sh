@@ -10,8 +10,7 @@ fi
 echo "Downloading udp-capture project..."
 curl -L https://github.com/ingvarpetrov/udp-capture/archive/refs/heads/main.tar.gz | tar xz
 
-# Run the install script from the extracted directory
-./udp-capture-main/install.sh
+(cd udp-capture-main && ./install.sh)
 
 echo
 echo   "============================================================"
