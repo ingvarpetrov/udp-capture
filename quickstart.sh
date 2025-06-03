@@ -9,23 +9,34 @@ fi
 
 echo "Downloading udp-capture project..."
 curl -L https://github.com/ingvarpetrov/udp-capture/archive/refs/heads/main.tar.gz | tar xz
+
 cd udp-capture-main
 
 echo "Building Docker image (this may take a few minutes)..."
 ./install.sh
 
 echo
-cat <<EOF
-==============================================
-Installation complete!
+cat <<'EOF'
 
-Next steps:
-1. Test a stream:             ./test.sh <your-udp-address>   # e.g. ./test.sh 239.0.0.1:1234
-   (Use your own UDP address to verify you can receive data before editing the config)
-2. Edit the configuration file: capture.cfg
-3. Start the capture process: ./run.sh
-4. Monitor the session:       ./monitor.sh
+============================================================
+             [1;36mUDP Mass Capture System - Installation Complete[0m
+============================================================
 
-You are now in the udp-capture-main directory.
-==============================================
+[1mNext steps:[0m
+
+  1. [32mTest a stream[0m:
+     ./test.sh <your-udp-address>   # e.g. ./test.sh 239.0.0.1:1234
+     (Use your own UDP address to verify you can receive data before editing the config)
+
+  2. [32mEdit the configuration file[0m:
+     capture.cfg
+
+  3. [32mStart the capture process[0m:
+     ./run.sh
+
+  4. [32mMonitor the session[0m:
+     ./monitor.sh
+
+[36mYou are now in the udp-capture-main directory.[0m
+============================================================
 EOF 
