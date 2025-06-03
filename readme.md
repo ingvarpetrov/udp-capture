@@ -15,14 +15,17 @@ bash <(curl -fsSL https://raw.githubusercontent.com/ingvarpetrov/udp-capture/mai
 
 <img src="src/capture-screenshot.png" alt="Capture Session Screenshot" width="400"/>
 
-## Overview
-This system captures multiple UDP streams into segmented .ts files using tsduck, running inside Docker and managed via tmux.
+## Output Folder
+
+- The `output` directory is mounted as a Docker volume at `/output` inside the container.
+- **The output folder is cleared (all files deleted) every time you run `./run.sh`.**
+- All captured files will appear in your local `output/` folder and will be owned by your user (using Docker's `-u` flag).
 
 ## Configuration
 Edit `capture.cfg` to set your parameters:
 
 ```
-output_folder=./output
+output_folder=/output
 parallel_streams=4
 segment_length_hours=1
 total_segments=24
@@ -37,7 +40,7 @@ udp_streams:
 239.0.0.5:1234
 ```
 
-- `output_folder`: Where to save captured files (relative to project root)
+- `output_folder`: Should be `/output` to match the Docker mount.
 - `parallel_streams`: How many streams to capture at once
 - `segment_length_hours`: Length of each segment in hours
 - `total_segments`: How many segments to capture
@@ -54,27 +57,29 @@ udp_streams:
    ```
    ./run.sh
    ```
-   This will start the container (if not already running) and launch the capture script in a tmux session inside the container.
+   - This will clear the output folder, remove any old container, start a new one, and launch the capture script in a tmux session inside the container.
 
 3. **Monitor the capture session in tmux:**
    ```
    ./monitor.sh
    ```
-   This will attach to the tmux session inside the running container for live monitoring.
+   - This will attach to the tmux session inside the running container for live monitoring.
 
 ## Tmux Interface
-- **Stop:** `ctrl-b x`
-- **Detach:** `ctrl-b d`
+- **Stop:** `ctrl-b x` (kills capture, all files will be finalized)
+- **Detach:** `ctrl-b d` (capture continues running in the background)
 - **Restart:** Exit and run `./run.sh` again
 - The tmux pane will show:
-  - Instructions
+  - Instructions (including what stop/detach do)
   - Which channels are being captured
   - Time left for current segment
   - Disk space left
   - Per-stream and overall progress
+  - **Per-stream segment sizes so far**
 
 ## Notes
-- All files (output, config, scripts) are mounted as volumes and owned by the host user.
+- All files (output, config, scripts) are mounted as volumes and owned by the host user (using Docker's `-u` flag; no entrypoint user logic).
+- The output folder is cleared on each run.
 - Uses an older, stable version of tsduck for compatibility.
 - Everything is configurable via `capture.cfg`.
 
@@ -86,7 +91,7 @@ You can use the provided `test.sh` script to check if a UDP stream is reachable 
 ./test.sh 239.0.0.1:1234
 ```
 
-This will attempt to capture a short sample and report success or failure.
+This will attempt to capture a short sample and report success or failure. The script uses Docker and will clean up the test file automatically.
 
 ## Troubleshooting
 
@@ -112,10 +117,6 @@ Replace `eth0` with your interface if needed.
 - Ensure your Docker container is running with `--network host` and `--privileged`.
 - Check that your interface is up and has the correct IP address.
 - Use `./test.sh` to verify stream reachability before starting a full capture.
-
-## Screenshot
-
-![Capture Session Screenshot](capture-screenshot.png)
 
 ## Docker Installation (Ubuntu)
 
