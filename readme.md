@@ -1,8 +1,19 @@
 # Mass Capture System
 
+## Quick Start (Ubuntu, Docker required)
+
+You can install and set up everything in one step (no git required):
+
+```sh
+bash <(curl -fsSL https://raw.githubusercontent.com/ingvarpetrov/udp-capture/main/quickstart.sh)
+```
+
+- This will download the project, build the Docker image, and print next steps.
+- **Note:** This script is for Ubuntu systems and assumes Docker is already installed.
+
 ## Screenshot
 
-![Capture Session Screenshot](capture-screenshot.png)
+![Capture Session Screenshot](src/capture-screenshot.png)
 
 ## Overview
 This system captures multiple UDP streams into segmented .ts files using tsduck, running inside Docker and managed via tmux.
