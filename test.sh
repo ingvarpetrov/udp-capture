@@ -21,7 +21,7 @@ TMPFILE="test_capture_$$.ts"
 PROJECT_DIR=$(pwd)
 
 # Build the docker run command (no -u, let entrypoint handle user/group)
-DOCKER_CMD=(docker run --rm \
+DOCKER_CMD=(docker run --rm --init \
   -v "$PROJECT_DIR":/data \
   --network host \
   tsduck-capture)
@@ -32,9 +32,16 @@ if [ -n "$INTERFACE_IP" ]; then
 fi
 TSP_CMD+=(-O file "/data/$TMPFILE")
 
+# Use timeout with --foreground if available
+if timeout --help 2>&1 | grep -q -- '--foreground'; then
+  TIMEOUT_CMD=(timeout --foreground 7)
+else
+  TIMEOUT_CMD=(timeout 7)
+fi
+
 echo "Testing capture from $UDP_ADDR using Docker..."
 echo "In the next few seconds, the script will try to connect to the multicast group and see if it can read data from it. Please hold on..."
-timeout 7 "${DOCKER_CMD[@]}" "${TSP_CMD[@]}"
+"${TIMEOUT_CMD[@]}" "${DOCKER_CMD[@]}" "${TSP_CMD[@]}"
 
 if [ -s "$TMPFILE" ]; then
   echo "SUCCESS: Data captured from $UDP_ADDR ($TMPFILE, $(du -h "$TMPFILE" | cut -f1))"
