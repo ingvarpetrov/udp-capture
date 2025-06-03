@@ -16,28 +16,20 @@ echo "Building Docker image (this may take a few minutes)..."
 ./install.sh
 
 echo
-cat <<'EOF'
-
-============================================================
- UDP Mass Capture System - Installation Complete
-============================================================
-
-
-echo -e "\033[1mNext steps:\033[0m"
-
-  1. \033[32mTest a stream\033[0m:
-     ./test.sh <your-udp-address>   # e.g. ./test.sh 239.0.0.1:1234
-     (Use your own UDP address to verify you can receive data before editing the config)
-
-  2. \033[32mEdit the configuration file\033[0m:
-     capture.cfg
-
-  3. \033[32mStart the capture process\033[0m:
-     ./run.sh
-
-  4. \033[32mMonitor the session\033[0m:
-     ./monitor.sh
-
-\033[36mYou are now in the udp-capture-main directory.\033[0m
-============================================================
-EOF 
+echo   "============================================================"
+echo   "| UDP Mass Capture System - Installation Complete           |"
+echo   "============================================================"
+echo   "| Next steps:                                              |"
+echo   "|                                                          |"
+echo   "|  1. Test a stream:                                       |"
+echo   "|     ./test.sh <your-udp-address>                         |"
+echo   "|     (e.g. ./test.sh 239.0.0.1:1234)                      |"
+echo   "|     (Use your own UDP address to verify you can receive   |"
+echo   "|      data before editing the config)                      |"
+echo   "|                                                          |"
+echo   "|  2. Edit the configuration file: capture.cfg              |"
+echo   "|  3. Start the capture process: ./run.sh                   |"
+echo   "|  4. Monitor the session:       ./monitor.sh               |"
+echo   "|                                                          |"
+echo   "| You are now in the udp-capture-main directory.            |"
+echo   "============================================================" 
