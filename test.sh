@@ -18,13 +18,10 @@ while IFS= read -r line; do
 done < "$CONFIG_FILE"
 
 TMPFILE="test_capture_$$.ts"
-USER_ID=$(id -u)
-GROUP_ID=$(id -g)
 PROJECT_DIR=$(pwd)
 
-# Build the docker run command
+# Build the docker run command (no -u, let entrypoint handle user/group)
 DOCKER_CMD=(docker run --rm \
-  -u $USER_ID:$GROUP_ID \
   -v "$PROJECT_DIR":/data \
   --network host \
   tsduck-capture)
