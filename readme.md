@@ -13,7 +13,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/ingvarpetrov/udp-capture/mai
 
 ## Screenshot
 
-![Capture Session Screenshot](src/capture-screenshot.png)
+<img src="capture-screenshot.png" alt="Capture Session Screenshot" width="400"/>
 
 ## Overview
 This system captures multiple UDP streams into segmented .ts files using tsduck, running inside Docker and managed via tmux.
