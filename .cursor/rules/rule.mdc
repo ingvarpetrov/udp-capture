@@ -1,9 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-- in this project, we are running everything in docker container using make command 
-- before changing the code, give me explanation and ask for my approval. 
-- we do not hardcode anything and we use environment variables. also we can read .env
-- we run everything in docker enviroment using make
