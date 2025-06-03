@@ -10,19 +10,8 @@ fi
 echo "Downloading udp-capture project..."
 curl -L https://github.com/ingvarpetrov/udp-capture/archive/refs/heads/main.tar.gz | tar xz
 
-(
-cd udp-capture-main
-
-# Check for Docker
-if ! command -v docker &> /dev/null; then
-  echo "ERROR: Docker is not installed or not in your PATH."
-  echo "Please see the Docker installation instructions in the README:"
-  echo "https://github.com/ingvarpetrov/udp-capture#docker-installation-ubuntu"
-  exit 1
-fi
-
-echo "Building Docker image (this may take a few minutes)..."
-./install.sh
+# Run the install script from the extracted directory
+./udp-capture-main/install.sh
 
 echo
 echo   "============================================================"
@@ -41,5 +30,4 @@ echo   "|  3. Start the capture process: ./run.sh                   |"
 echo   "|  4. Monitor the session:       ./monitor.sh               |"
 echo   "|                                                          |"
 echo   "| You are now in the udp-capture-main directory.            |"
-echo   "============================================================"
-) 
+echo   "============================================================" 
