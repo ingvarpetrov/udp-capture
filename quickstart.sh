@@ -1,9 +1,12 @@
 #!/bin/bash
 set -e
 
-# Download and extract the latest udp-capture repo tarball
-TMPDIR=$(mktemp -d)
-cd "$TMPDIR"
+# Download and extract the latest udp-capture repo tarball into the current directory
+if [ -d udp-capture-main ]; then
+  echo "Removing existing udp-capture-main directory..."
+  rm -rf udp-capture-main
+fi
+
 echo "Downloading udp-capture project..."
 curl -L https://github.com/ingvarpetrov/udp-capture/archive/refs/heads/main.tar.gz | tar xz
 cd udp-capture-main
