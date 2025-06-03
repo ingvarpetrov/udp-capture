@@ -26,15 +26,15 @@ DOCKER_CMD=(docker run --rm \
   --network host \
   tsduck-capture)
 
-TSP_CMD=(tsp)
+TSP_CMD=(tsp -I ip "$UDP_ADDR")
 if [ -n "$INTERFACE_IP" ]; then
-  TSP_CMD+=( -I ip "$UDP_ADDR" --local-address "$INTERFACE_IP" -O file "/data/$TMPFILE" --max-duration 5 )
-else
-  TSP_CMD+=( -I ip "$UDP_ADDR" -O file "/data/$TMPFILE" --max-duration 5 )
+  TSP_CMD+=(--local-address "$INTERFACE_IP")
 fi
+TSP_CMD+=(-O file "/data/$TMPFILE")
 
 echo "Testing capture from $UDP_ADDR using Docker..."
-"${DOCKER_CMD[@]}" "${TSP_CMD[@]}"
+echo "In the next few seconds, the script will try to connect to the multicast group and see if it can read data from it. Please hold on..."
+timeout 7 "${DOCKER_CMD[@]}" "${TSP_CMD[@]}"
 
 if [ -s "$TMPFILE" ]; then
   echo "SUCCESS: Data captured from $UDP_ADDR ($TMPFILE, $(du -h "$TMPFILE" | cut -f1))"
