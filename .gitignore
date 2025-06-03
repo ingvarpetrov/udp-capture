@@ -18,4 +18,7 @@ test_capture_*.ts
 *.log
 
 # Ignore Python cache (if any)
-__pycache__/ 
+__pycache__/
+
+# Ignore Cursor IDE/project files
+.cursor 
