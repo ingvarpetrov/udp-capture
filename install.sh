@@ -26,3 +26,4 @@ echo   "|  4. Monitor the session:       ./monitor.sh               |"
 echo   "|                                                          |"
 echo   "| You are now in the udp-capture-main directory.            |"
 echo   "============================================================" 
+cd udp-capture-main
