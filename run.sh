@@ -6,6 +6,11 @@ USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 PROJECT_DIR=$(pwd)
 
+# Clear the output directory
+if [ -d "$PROJECT_DIR/output" ]; then
+  rm -f "$PROJECT_DIR/output"/*
+fi
+
 # Stop and remove any existing container with the same name
 if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
   docker rm -f $CONTAINER_NAME
