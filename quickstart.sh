@@ -10,6 +10,7 @@ fi
 echo "Downloading udp-capture project..."
 curl -L https://github.com/ingvarpetrov/udp-capture/archive/refs/heads/main.tar.gz | tar xz
 
+(
 cd udp-capture-main
 
 # Check for Docker
@@ -40,4 +41,5 @@ echo   "|  3. Start the capture process: ./run.sh                   |"
 echo   "|  4. Monitor the session:       ./monitor.sh               |"
 echo   "|                                                          |"
 echo   "| You are now in the udp-capture-main directory.            |"
-echo   "============================================================" 
+echo   "============================================================"
+) 
