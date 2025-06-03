@@ -68,7 +68,16 @@ stream_segments=()
 show_progress() {
     echo -e "${CYAN}[Current Streams Capturing]${RESET}"
     for idx in "${!active_streams[@]}"; do
-        printf "  %2d. %-20s  [Segments: %d/%d]\n" $((idx+1)) "${active_streams[$idx]}" "${stream_segments[$idx]}" "$total_segments"
+        stream_num=$((idx+1))
+        # Find all segment files for this stream and sum their sizes
+        pattern="$output_folder/stream$(printf '%02d' $stream_num)_seg*.ts"
+        size=0
+        if compgen -G "$pattern" > /dev/null; then
+            size=$(du -ch $pattern 2>/dev/null | grep total | awk '{print $1}')
+        else
+            size="0"
+        fi
+        printf "  %2d. %-20s  [Segments: %d/%d, Size: %s]\n" $((idx+1)) "${active_streams[$idx]}" "${stream_segments[$idx]}" "$total_segments" "$size"
     done
     echo -e "\n${MAGENTA}[Progress]${RESET}"
     printf "  Segment:        %s / %s\n" "$current_segment" "$total_segments"
