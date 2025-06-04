@@ -26,7 +26,11 @@ DOCKER_CMD=(docker run --rm --init \
   --network host \
   pu-capture)
 
-PU_CMD=(/usr/local/bin/__pu "$UDP_ADDR" -ii "$INTERFACE_IP" -o "/data/$TMPFILE" -t "$DURATION")
+PU_CMD=(/usr/local/bin/__pu "$UDP_ADDR")
+if [ -n "$INTERFACE_IP" ]; then
+  PU_CMD+=(-ii "$INTERFACE_IP")
+fi
+PU_CMD+=(-o "/data/$TMPFILE" -t "$DURATION")
 
 # Use timeout with --foreground if available
 if timeout --help 2>&1 | grep -q -- '--foreground'; then
