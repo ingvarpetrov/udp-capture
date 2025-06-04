@@ -22,7 +22,7 @@ CONFIG_FILE="/app/capture.cfg"
 # Parse config
 output_folder="./output"
 parallel_streams=4
-segment_length_hours=1
+segment_length_seconds=3600
 total_segments=24
 udp_streams=()
 interface_ip=""
@@ -34,8 +34,8 @@ parse_config() {
             output_folder="${line#output_folder=}"
         elif [[ "$line" =~ ^parallel_streams= ]]; then
             parallel_streams="${line#parallel_streams=}"
-        elif [[ "$line" =~ ^segment_length_hours= ]]; then
-            segment_length_hours="${line#segment_length_hours=}"
+        elif [[ "$line" =~ ^segment_length_seconds= ]]; then
+            segment_length_seconds="${line#segment_length_seconds=}"
         elif [[ "$line" =~ ^total_segments= ]]; then
             total_segments="${line#total_segments=}"
         elif [[ "$line" =~ ^interface_ip= ]]; then
@@ -46,7 +46,7 @@ parse_config() {
             udp_streams+=("$line")
         fi
     done < "$CONFIG_FILE"
-    echo -e "${CYAN}[DEBUG] Parsed config: output_folder=$output_folder, parallel_streams=$parallel_streams, segment_length_hours=$segment_length_hours, total_segments=$total_segments, interface_ip=$interface_ip, udp_streams=(${udp_streams[*]})${RESET}" >&2
+    echo -e "${CYAN}[DEBUG] Parsed config: output_folder=$output_folder, parallel_streams=$parallel_streams, segment_length_seconds=$segment_length_seconds, total_segments=$total_segments, interface_ip=$interface_ip, udp_streams=(${udp_streams[*]})${RESET}" >&2
 }
 
 show_instructions() {
@@ -82,15 +82,15 @@ show_progress() {
     echo -e "\n${MAGENTA}[Progress]${RESET}"
     printf "  Segment:        %s / %s\n" "$current_segment" "$total_segments"
     # Progress bar for current segment
-    local percent=$(( 100 * elapsed / segment_seconds ))
+    local percent=$(( 100 * elapsed / segment_length_seconds ))
     local bar_length=20
     local filled=$(( bar_length * percent / 100 ))
     local empty=$(( bar_length - filled ))
     local bar=""
     for ((i=0; i<filled; i++)); do bar+="#"; done
     for ((i=0; i<empty; i++)); do bar+="-"; done
-    local mins=$(( (segment_seconds - elapsed) / 60 ))
-    local secs=$(( (segment_seconds - elapsed) % 60 ))
+    local mins=$(( (segment_length_seconds - elapsed) / 60 ))
+    local secs=$(( (segment_length_seconds - elapsed) % 60 ))
     printf "  Time left:      %2dm %02ds [${GREEN}%s${RESET}] %d%%\n" "$mins" "$secs" "$bar" "$percent"
     # Overall progress
     local total_segments_all=$((total_streams * total_segments))
@@ -116,7 +116,6 @@ show_progress() {
 main() {
     parse_config
     mkdir -p "$output_folder"
-    segment_seconds=$((segment_length_hours * 3600))
     total_streams=${#udp_streams[@]}
     current_segment=1
     # Initialize per-stream segment counters
@@ -140,7 +139,7 @@ main() {
             if [[ -n "$interface_ip" ]]; then
                 pu_cmd+=(-ii "$interface_ip")
             fi
-            pu_cmd+=(-o "$out_file" -t "$segment_seconds")
+            pu_cmd+=(-o "$out_file" -t "$segment_length_seconds")
             echo -e "${YELLOW}[DEBUG] Launching: ${pu_cmd[*]}${RESET}" >&2
             "${pu_cmd[@]}" >/dev/null 2>&1 &
             pids+=("$!")
@@ -153,7 +152,7 @@ main() {
             clear
             show_instructions
             show_progress
-            if [[ $elapsed -ge $segment_seconds ]]; then
+            if [[ $elapsed -ge $segment_length_seconds ]]; then
                 break
             fi
             sleep 10
