@@ -132,8 +132,8 @@ main() {
         for ((i=0; i<$total_streams && i<$parallel_streams; i++)); do
             stream="${udp_streams[$i]}"
             out_file="$output_folder/stream$(printf '%02d' $((i+1)))_seg$(printf '%02d' $current_segment).ts"
-            echo -e "${YELLOW}[DEBUG] Launching: ./src/bin/__pu $stream -ii $interface_ip -o $out_file -t $segment_seconds${RESET}" >&2
-            ./src/bin/__pu "$stream" -ii "$interface_ip" -o "$out_file" -t "$segment_seconds" &
+            echo -e "${YELLOW}[DEBUG] Launching: /usr/local/bin/__pu $stream -ii $interface_ip -o $out_file -t $segment_seconds${RESET}" >&2
+            /usr/local/bin/__pu "$stream" -ii "$interface_ip" -o "$out_file" -t "$segment_seconds" &
             pids+=("$!")
             active_streams+=("$stream")
             idxs+=("$i")

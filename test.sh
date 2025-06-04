@@ -26,7 +26,7 @@ DOCKER_CMD=(docker run --rm --init \
   --network host \
   tsduck-capture)
 
-PU_CMD=(/src/bin/__pu "$UDP_ADDR" -ii "$INTERFACE_IP" -o "/data/$TMPFILE" -t "$DURATION")
+PU_CMD=(/usr/local/bin/__pu "$UDP_ADDR" -ii "$INTERFACE_IP" -o "/data/$TMPFILE" -t "$DURATION")
 
 # Use timeout with --foreground if available
 if timeout --help 2>&1 | grep -q -- '--foreground'; then

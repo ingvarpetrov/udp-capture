@@ -19,6 +19,10 @@ RUN apt-get update && apt-get install -y sudo gosu
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Copy __pu binary
+COPY bin/__pu /usr/local/bin/__pu
+RUN chmod +x /usr/local/bin/__pu
+
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint.sh"]
