@@ -4,7 +4,7 @@ set -e
 # Ensure we are in the udp-capture-main directory
 # (No longer auto-cd; instruct user instead)
 
-docker build -t tsduck-capture -f src/Dockerfile src 
+docker build -t pu-capture -f src/Dockerfile src 
 
 echo
 echo   "============================================================"

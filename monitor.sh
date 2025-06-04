@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-CONTAINER_NAME=tsduck-capture
+CONTAINER_NAME=pu-capture
 
 # Install tmux if not present
 if ! command -v tmux &> /dev/null; then
