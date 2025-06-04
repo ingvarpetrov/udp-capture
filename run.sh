@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-CONTAINER_NAME=tsduck-capture
+CONTAINER_NAME=pu-capture
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 PROJECT_DIR=$(pwd)

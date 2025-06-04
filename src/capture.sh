@@ -132,12 +132,8 @@ main() {
         for ((i=0; i<$total_streams && i<$parallel_streams; i++)); do
             stream="${udp_streams[$i]}"
             out_file="$output_folder/stream$(printf '%02d' $((i+1)))_seg$(printf '%02d' $current_segment).ts"
-            echo -e "${YELLOW}[DEBUG] Launching: tsp -I ip $stream -O file $out_file${RESET}" >&2
-            if [[ -n "$interface_ip" ]]; then
-                tsp -I ip $stream --local-address "$interface_ip" -O file "$out_file" &
-            else
-                tsp -I ip $stream -O file "$out_file" &
-            fi
+            echo -e "${YELLOW}[DEBUG] Launching: ./src/bin/__pu $stream -ii $interface_ip -o $out_file -t $segment_seconds${RESET}" >&2
+            ./src/bin/__pu "$stream" -ii "$interface_ip" -o "$out_file" -t "$segment_seconds" &
             pids+=("$!")
             active_streams+=("$stream")
             idxs+=("$i")
@@ -152,10 +148,6 @@ main() {
                 break
             fi
             sleep 10
-        done
-        # Kill all tsp processes for this segment
-        for pid in "${pids[@]}"; do
-            kill $pid 2>/dev/null || true
         done
         # Update per-stream segment counters
         for idx in "${idxs[@]}"; do
