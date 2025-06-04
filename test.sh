@@ -24,7 +24,7 @@ PROJECT_DIR=$(pwd)
 DOCKER_CMD=(docker run --rm --init \
   -v "$PROJECT_DIR":/data \
   --network host \
-  tsduck-capture)
+  pu-capture)
 
 PU_CMD=(/usr/local/bin/__pu "$UDP_ADDR" -ii "$INTERFACE_IP" -o "/data/$TMPFILE" -t "$DURATION")
 

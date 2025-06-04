@@ -27,7 +27,7 @@ docker run -d \
   -v "$PROJECT_DIR/src":/src \
   -v "$PROJECT_DIR/output":/output \
   -v "$PROJECT_DIR/capture.cfg":/app/capture.cfg \
-  tsduck-capture
+  pu-capture
 # Always (re)start tmux capture session
 if docker exec $CONTAINER_NAME tmux has-session -t capture 2>/dev/null; then
   docker exec $CONTAINER_NAME tmux kill-session -t capture
