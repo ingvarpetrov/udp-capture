@@ -1,4 +1,8 @@
 #!/bin/bash
 set -e
 
-exec "$@" 
+if [ $# -gt 0 ]; then
+  exec "$@"
+else
+  exec tail -f /dev/null
+fi 
