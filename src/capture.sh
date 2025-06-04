@@ -131,6 +131,10 @@ main() {
         idxs=()
         for ((i=0; i<$total_streams && i<$parallel_streams; i++)); do
             stream="${udp_streams[$i]}"
+            # Ensure stream is prefixed with udp://
+            if [[ "$stream" != udp://* ]]; then
+                stream="udp://$stream"
+            fi
             out_file="$output_folder/stream$(printf '%02d' $((i+1)))_seg$(printf '%02d' $current_segment).ts"
             pu_cmd=(/usr/local/bin/__pu "$stream")
             if [[ -n "$interface_ip" ]]; then
@@ -138,7 +142,7 @@ main() {
             fi
             pu_cmd+=(-o "$out_file" -t "$segment_seconds")
             echo -e "${YELLOW}[DEBUG] Launching: ${pu_cmd[*]}${RESET}" >&2
-            "${pu_cmd[@]}" &
+            "${pu_cmd[@]}" >/dev/null 2>&1 &
             pids+=("$!")
             active_streams+=("$stream")
             idxs+=("$i")

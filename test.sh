@@ -26,6 +26,14 @@ DOCKER_CMD=(docker run --rm --init \
   --network host \
   pu-capture)
 
+# Ensure UDP_ADDR is prefixed with udp://
+if [[ "$UDP_ADDR" != udp://* ]]; then
+  UDP_ADDR="udp://$UDP_ADDR"
+fi
+
+# Set default duration if not set
+: "${DURATION:=60}"
+
 PU_CMD=(/usr/local/bin/__pu "$UDP_ADDR")
 if [ -n "$INTERFACE_IP" ]; then
   PU_CMD+=(-ii "$INTERFACE_IP")
@@ -41,7 +49,7 @@ fi
 
 echo "Testing capture from $UDP_ADDR using Docker..."
 echo "In the next few seconds, the script will try to connect to the multicast group and see if it can read data from it. Please hold on..."
-"${TIMEOUT_CMD[@]}" "${DOCKER_CMD[@]}" "${PU_CMD[@]}"
+"${TIMEOUT_CMD[@]}" "${DOCKER_CMD[@]}" "${PU_CMD[@]}" >/dev/null 2>&1
 
 # Wait a moment to ensure file is written
 sleep 1
